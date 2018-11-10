@@ -78,6 +78,7 @@ MTNewCmd::exec(const string &option)
 	// TODO
 	try{
 		mtest.newObjs(1);
+		mtest.newArrs(1,1);
 	}
 	catch(bad_alloc){
 		cerr << "bad_alloc catched" << endl;

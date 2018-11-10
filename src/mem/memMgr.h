@@ -48,7 +48,7 @@ private:                                                                    \
 //
 // To promote 't' to the nearest multiple of SIZE_T;
 // e.g. Let SIZE_T = 8;  toSizeT(7) = 8, toSizeT(12) = 16
-#define toSizeT(t) (SIZE_T * (t / SIZE_T + 1)) /* TODO */
+#define toSizeT(t) ((t % 8 == 0) ? t : (SIZE_T * (t / SIZE_T + 1))) /* TODO */
 
 //
 // To demote 't' to the nearest multiple of SIZE_T
@@ -95,9 +95,10 @@ class MemBlock
   bool getMem(size_t t, T *&ret)
   {
     //TODO
-    if(_ptr + toSizeT(t) > _end) return false;
-    ret = (T*)_ptr;
-    _ptr+= toSizeT(t);
+    if (_ptr + toSizeT(t) > _end)
+      return false;
+    ret = (T *)_ptr;
+    _ptr += toSizeT(t);
     return true;
   }
   size_t getRemainSize() const { return size_t(_end - _ptr); }
@@ -194,8 +195,22 @@ public:
     assert(b % SIZE_T == 0);
 #ifdef MEM_DEBUG
     cout << "Resetting memMgr...(" << b << ")" << endl;
-#endif // MEM_DEBUG
+#endif // MEM_DEBUG \
        // TODO
+    while (_activeBlock->_nextBlock != 0)
+    {
+      MemBlock<T> *nxtblk = _activeBlock->_nextBlock;
+      delete _activeBlock;
+      _activeBlock = nxtblk;
+    }
+    _activeBlock->reset();
+    if (b != 0)
+    {
+      delete _activeBlock;
+      _blockSize = b;
+      _activeBlock = new MemBlock<T>(0, _blockSize);
+    }
+    return;
   }
   // Called by new
   T *alloc(size_t t)
@@ -289,7 +304,7 @@ private:
     assert(t % SIZE_T == 0);
     assert(t >= S);
     // TODO
-    return 0;
+    return (t-8)/56;
   }
   // Go through _recycleList[m], its _nextList, and _nexList->_nextList, etc,
   //    to find a recycle list whose "_arrSize" == "n"
@@ -314,17 +329,21 @@ private:
     cout << "Calling MemMgr::getMem...(" << t << ")" << endl;
 #endif // MEM_DEBUG
     // 1. Make sure to promote t to a multiple of SIZE_T
+
     t = toSizeT(t);
+
     // 2. Check if the requested memory is greater than the block size.
     //    If so, throw a "bad_alloc()" exception.
     //    Print this message for exception
     //    cerr << "Requested memory (" << t << ") is greater than block size"
     //         << "(" << _blockSize << "). " << "Exception raised...\n";
     // TODO
-    if(t> _blockSize){
+    if (t > _blockSize)
+    {
       throw bad_alloc();
-      cerr  << "Requested memory (" << t << ") is greater than block size"
-            << "(" << _blockSize << "). " << "Exception raised...\n";
+      cerr << "Requested memory (" << t << ") is greater than block size"
+           << "(" << _blockSize << "). "
+           << "Exception raised...\n";
     }
     // 3. Check the _recycleList first...
     //    Print this message for memTest.debug
@@ -334,18 +353,20 @@ private:
     //    => 'n' is the size of array
     //    => "ret" is the return address
     size_t n = getArraySize(t);
-// TODO
-// If no match from recycle list...
-// 4. Get the memory from _activeBlock
-    if(!_activeBlock->getMem(t,ret)){
-     _activeBlock = new MemBlock<T>(_activeBlock, _blockSize);
-    #ifdef MEM_DEBUG
-    cout << "Recycling " << ret << " to _recycleList[" << rn << "]\n";
-    #endif // MEM_DEBUG
+    // TODO
+    // If no match from recycle list...
+    // 4. Get the memory from _activeBlock
+    if (!_activeBlock->getMem(t, ret))
+    {
+      _activeBlock = new MemBlock<T>(_activeBlock, _blockSize);
+      _activeBlock->getMem(t, ret);
+#ifdef MEM_DEBUG
+      cout << "Recycling " << ret << " to _recycleList[" << rn << "]\n";
+#endif // MEM_DEBUG
     }
-    #ifdef MEM_DEBUG
+#ifdef MEM_DEBUG
     cout << "New MemBlock... " << _activeBlock << endl;
-    #endif // MEM_DEBUG
+#endif // MEM_DEBUG
 // 5. If not enough, recycle the remained memory and print out ---
 //    Note: recycle to the as biggest array index as possible
 //    Note: rn is the array size
