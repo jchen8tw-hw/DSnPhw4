@@ -48,7 +48,7 @@ clean:
 	@echo "Removing $(SRCLIBS)..."
 	@cd lib; rm -f $(SRCLIBS)
 	@echo "Removing $(EXEC)..."
-	@rm -f bin/$(EXEC)* 
+	@rm -rf bin/$(EXEC)* 
 
 ctags:	  
 	@rm -f src/tags
