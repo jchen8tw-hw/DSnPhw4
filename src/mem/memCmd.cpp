@@ -78,11 +78,11 @@ MTNewCmd::exec(const string &option)
 	// TODO
 	try{
 		mtest.newObjs(1);
-		mtest.newArrs(1,1);
+		mtest.newArrs(1,3);
+		//mtest.newArrs(1,1);
 	}
 	catch(bad_alloc){
-		cerr << "bad_alloc catched" << endl;
-		assert(0);
+		return CMD_EXEC_ERROR;
 	}
 	// Use try-catch to catch the bad_alloc exception
 	return CMD_EXEC_DONE;
@@ -106,7 +106,8 @@ CmdExecStatus
 MTDeleteCmd::exec(const string &option)
 {
 	// TODO
-
+	mtest.deleteObj(0);
+	mtest.deleteArr(0);
 	return CMD_EXEC_DONE;
 }
 

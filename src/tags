@@ -1,0 +1,21 @@
+MEM_MGR_INIT	mem/memMgr.h	/^#define MEM_MGR_INIT(T) \\$/
+USE_MEM_MGR	mem/memMgr.h	/^#define USE_MEM_MGR(T)                            /
+exec	mem/memCmd.cpp	/^MTResetCmd::exec(const string &option)$/
+help	mem/memCmd.cpp	/^void MTResetCmd::help() const$/
+initMemCmd	mem/memCmd.cpp	/^bool initMemCmd()$/
+sizeof	mem/memMgr.h	/^\/\/ DO NOT use 4 or 8 for sizeof(size_t) in your /
+usage	mem/memCmd.cpp	/^void MTResetCmd::usage(ostream &os) const$/
+clearList	util/util.h	/^void clearList(T& l)$/
+getHashSize	util/util.cpp	/^size_t getHashSize(size_t s) {$/
+isValidVarName	util/myString.cpp	/^isValidVarName(const string& str)$/
+listDir	util/util.cpp	/^(vector<string>& files, const string& prefix, cons/
+myGetChar	util/myGetChar.cpp	/^char myGetChar(istream& istr)$/
+myStr2Int	util/myString.cpp	/^myStr2Int(const string& str, int& num)$/
+myStrGetTok	util/myString.cpp	/^myStrGetTok(const string& str, string& tok, size_t/
+removeData	util/util.h	/^void removeData(T& l, const D& d)$/
+reset_keypress	util/myGetChar.cpp	/^static void reset_keypress(void)$/
+set_keypress	util/myGetChar.cpp	/^static void set_keypress(void)$/
+strlen	util/myString.cpp	/^\/\/ 1. strlen(s1) must >= n$/
+Mmain.cpp	main/main.cpp	/^int main(int argc, char **argv)$/
+myexit	main/main.cpp	/^myexit()$/
+usage	main/main.cpp	/^usage()$/
