@@ -76,12 +76,109 @@ CmdExecStatus
 MTNewCmd::exec(const string &option)
 {
 	// TODO
-	try{
-		mtest.newObjs(1);
-		mtest.newArrs(1,3);
+	vector<string> tokens;
+	if (!CmdExec::lexOptions(option, tokens))
+		return CMD_EXEC_ERROR;
+	size_t n = tokens.size();
+	bool doarray = false;
+	size_t AIndex = 0;
+	for (size_t i = 0; i < n; i++)
+	{
+		if (myStrNCmp("-Array", tokens[i], 2) == 0)
+		{
+			AIndex = i;
+			doarray = true;
+		}
+	}
+	try
+	{
+		if (!doarray)
+		{
+			if (n == 0)
+			{
+				errorOption(CMD_OPT_MISSING, "");
+				return CMD_EXEC_ERROR;
+			}
+			else if (n > 1)
+			{
+				errorOption(CMD_OPT_EXTRA, tokens[1]);
+				return CMD_EXEC_ERROR;
+			}
+			else
+			{
+				int newobjs = 0;
+				if (!myStr2Int(tokens[0], newobjs) || newobjs < 1)
+				{
+					errorOption(CMD_OPT_ILLEGAL, tokens[0]);
+					return CMD_EXEC_ERROR;
+				}
+				mtest.newObjs(newobjs);
+			}
+		}
+		else
+		{
+			if (AIndex > 1)
+			{
+				errorOption(CMD_OPT_EXTRA, tokens[1]);
+				return CMD_EXEC_ERROR;
+			}
+			else
+			{
+				if(AIndex == 0){
+					if(n < 3){
+						errorOption(CMD_OPT_MISSING,"");
+						return CMD_EXEC_ERROR;
+					}
+					else if(n > 3){
+						errorOption(CMD_OPT_EXTRA,tokens[3]);
+						return CMD_EXEC_ERROR;
+					}
+					else{
+						int newarrs = 0;
+						if(!myStr2Int(tokens[AIndex+1],newarrs) || newarrs < 1){
+							errorOption(CMD_OPT_ILLEGAL,tokens[AIndex+1]);
+							return CMD_EXEC_ERROR;
+						}
+						int newobjs = 0;
+						if(!myStr2Int(tokens[2],newobjs) || newobjs < 1){
+							errorOption(CMD_OPT_ILLEGAL,tokens[2]);
+							return CMD_EXEC_ERROR;
+						}
+						mtest.newArrs(newobjs,newarrs);
+					}
+				}
+				else{
+					if(n < 3){
+						errorOption(CMD_OPT_MISSING,"");
+						return CMD_EXEC_ERROR;
+					}
+					else if(n > 3){
+						errorOption(CMD_OPT_EXTRA,tokens[3]);
+						return CMD_EXEC_ERROR;
+					}
+					else{
+						int newarrs = 0;
+						if(!myStr2Int(tokens[AIndex+1],newarrs) || newarrs < 1){
+							errorOption(CMD_OPT_ILLEGAL,tokens[AIndex+1]);
+							return CMD_EXEC_ERROR;
+						}
+						int newobjs = 0;
+						if(!myStr2Int(tokens[0],newobjs) || newobjs < 1){
+							errorOption(CMD_OPT_ILLEGAL,tokens[0]);
+							return CMD_EXEC_ERROR;
+						}
+						mtest.newArrs(newobjs,newarrs);
+					}
+				}
+				//mtest.newObjs(newobjs);
+			}
+		}
+		//mtest.newObjs(1);
+		//mtest.newArrs(1,3);
 		//mtest.newArrs(1,1);
 	}
-	catch(bad_alloc){
+	catch (bad_alloc)
+	{
 		return CMD_EXEC_ERROR;
 	}
 	// Use try-catch to catch the bad_alloc exception
