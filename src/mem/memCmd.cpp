@@ -229,7 +229,7 @@ MTDeleteCmd::exec(const string &option)
 		}
 		else
 		{
-			if (myStrNCmp("-Index", tokens[0],2) == 0)
+			if (myStrNCmp("-Index", tokens[0], 2) == 0)
 			{
 				if (n == 1)
 				{
@@ -248,6 +248,25 @@ MTDeleteCmd::exec(const string &option)
 				else
 				{
 					mtest.deleteObj(index);
+				}
+			}
+			else if (myStrNCmp("-Random", tokens[0], 2) == 0)
+			{
+				if (n == 1)
+				{
+					return errorOption(CMD_OPT_MISSING, tokens[0]);
+				}
+				int randId = 0;
+				if (!myStr2Int(tokens[1], randId) || randId < 1)
+				{
+					return errorOption(CMD_OPT_ILLEGAL, tokens[1]);
+				}
+				else
+				{
+					for (size_t i = 0; i < randId; i++)
+					{
+						mtest.deleteObj(rnGen(mtest.getObjListSize()));
+					}
 				}
 			}
 			else
