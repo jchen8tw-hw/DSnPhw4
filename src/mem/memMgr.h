@@ -154,9 +154,11 @@ class MemRecycleList
   // DO NOT release the memory occupied by MemMgr/MemBlock
   void reset()
   {
-    _first = 0;
+   
     if (_nextList != 0)
       delete _nextList;
+    _first = 0;
+    _nextList = 0;
     return;
     // TODO
   }
@@ -273,7 +275,7 @@ public:
     // TODO
     // Get the array size 'n' stored by system,
     // which is also the _recycleList index
-    size_t n = *((size_t *)(p - 8));
+    size_t n = *(size_t *)p;
 #ifdef MEM_DEBUG
     cout << ">> Array size = " << n << endl;
     cout << "Recycling " << p << " to _recycleList[" << n << "]" << endl;
@@ -330,7 +332,7 @@ private:
     assert(t % SIZE_T == 0);
     assert(t >= S);
     // TODO
-    return (t - 8) / 56;
+    return (t - 8) / S;
   }
   // Go through _recycleList[m], its _nextList, and _nexList->_nextList, etc,
   //    to find a recycle list whose "_arrSize" == "n"
