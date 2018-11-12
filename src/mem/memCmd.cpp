@@ -96,21 +96,18 @@ MTNewCmd::exec(const string &option)
 		{
 			if (n == 0)
 			{
-				errorOption(CMD_OPT_MISSING, "");
-				return CMD_EXEC_ERROR;
+				return errorOption(CMD_OPT_MISSING, "");
 			}
 			else if (n > 1)
 			{
-				errorOption(CMD_OPT_EXTRA, tokens[1]);
-				return CMD_EXEC_ERROR;
+				return errorOption(CMD_OPT_EXTRA, tokens[1]);
 			}
 			else
 			{
 				int newobjs = 0;
 				if (!myStr2Int(tokens[0], newobjs) || newobjs < 1)
 				{
-					errorOption(CMD_OPT_ILLEGAL, tokens[0]);
-					return CMD_EXEC_ERROR;
+					return errorOption(CMD_OPT_ILLEGAL, tokens[0]);
 				}
 				mtest.newObjs(newobjs);
 			}
@@ -119,55 +116,58 @@ MTNewCmd::exec(const string &option)
 		{
 			if (AIndex > 1)
 			{
-				errorOption(CMD_OPT_EXTRA, tokens[1]);
-				return CMD_EXEC_ERROR;
+				return errorOption(CMD_OPT_EXTRA, tokens[1]);
 			}
 			else
 			{
-				if(AIndex == 0){
-					if(n < 3){
-						errorOption(CMD_OPT_MISSING,"");
-						return CMD_EXEC_ERROR;
+				if (AIndex == 0)
+				{
+					if (n < 3)
+					{
+						return errorOption(CMD_OPT_MISSING, "");
 					}
-					else if(n > 3){
-						errorOption(CMD_OPT_EXTRA,tokens[3]);
-						return CMD_EXEC_ERROR;
+					else if (n > 3)
+					{
+						return errorOption(CMD_OPT_EXTRA, tokens[3]);
 					}
-					else{
+					else
+					{
 						int newarrs = 0;
-						if(!myStr2Int(tokens[AIndex+1],newarrs) || newarrs < 1){
-							errorOption(CMD_OPT_ILLEGAL,tokens[AIndex+1]);
-							return CMD_EXEC_ERROR;
+						if (!myStr2Int(tokens[AIndex + 1], newarrs) || newarrs < 1)
+						{
+							return errorOption(CMD_OPT_ILLEGAL, tokens[AIndex + 1]);
 						}
 						int newobjs = 0;
-						if(!myStr2Int(tokens[2],newobjs) || newobjs < 1){
-							errorOption(CMD_OPT_ILLEGAL,tokens[2]);
-							return CMD_EXEC_ERROR;
+						if (!myStr2Int(tokens[2], newobjs) || newobjs < 1)
+						{
+							return errorOption(CMD_OPT_ILLEGAL, tokens[2]);
 						}
-						mtest.newArrs(newobjs,newarrs);
+						mtest.newArrs(newobjs, newarrs);
 					}
 				}
-				else{
-					if(n < 3){
-						errorOption(CMD_OPT_MISSING,"");
-						return CMD_EXEC_ERROR;
+				else
+				{
+					if (n < 3)
+					{
+						return errorOption(CMD_OPT_MISSING, "");
 					}
-					else if(n > 3){
-						errorOption(CMD_OPT_EXTRA,tokens[3]);
-						return CMD_EXEC_ERROR;
+					else if (n > 3)
+					{
+						return errorOption(CMD_OPT_EXTRA, tokens[3]);
 					}
-					else{
+					else
+					{
 						int newarrs = 0;
-						if(!myStr2Int(tokens[AIndex+1],newarrs) || newarrs < 1){
-							errorOption(CMD_OPT_ILLEGAL,tokens[AIndex+1]);
-							return CMD_EXEC_ERROR;
+						if (!myStr2Int(tokens[AIndex + 1], newarrs) || newarrs < 1)
+						{
+							return errorOption(CMD_OPT_ILLEGAL, tokens[AIndex + 1]);
 						}
 						int newobjs = 0;
-						if(!myStr2Int(tokens[0],newobjs) || newobjs < 1){
-							errorOption(CMD_OPT_ILLEGAL,tokens[0]);
-							return CMD_EXEC_ERROR;
+						if (!myStr2Int(tokens[0], newobjs) || newobjs < 1)
+						{
+							return errorOption(CMD_OPT_ILLEGAL, tokens[0]);
 						}
-						mtest.newArrs(newobjs,newarrs);
+						mtest.newArrs(newobjs, newarrs);
 					}
 				}
 				//mtest.newObjs(newobjs);
@@ -203,8 +203,131 @@ CmdExecStatus
 MTDeleteCmd::exec(const string &option)
 {
 	// TODO
-	mtest.deleteObj(0);
-	mtest.deleteArr(0);
+	vector<string> tokens;
+	if (!CmdExec::lexOptions(option, tokens))
+		return CMD_EXEC_ERROR;
+	size_t n = tokens.size();
+	bool doarray = false;
+	size_t AIndex = 0;
+	for (size_t i = 0; i < n; i++)
+	{
+		if (myStrNCmp("-Array", tokens[i], 2) == 0)
+		{
+			AIndex = i;
+			doarray = true;
+		}
+	}
+	if (!doarray)
+	{
+		if (n == 0)
+		{
+			return errorOption(CMD_OPT_MISSING, "");
+		}
+		else if (n > 2)
+		{
+			return errorOption(CMD_OPT_EXTRA, tokens[1]);
+		}
+		else
+		{
+			if (myStrNCmp("-Index", tokens[0],2) == 0)
+			{
+				if (n == 1)
+				{
+					return errorOption(CMD_OPT_MISSING, tokens[0]);
+				}
+				int index = 0;
+				if (!myStr2Int(tokens[1], index) || index < 0)
+				{
+					return errorOption(CMD_OPT_ILLEGAL, tokens[1]);
+				}
+				else if (mtest.getObjListSize() <= index)
+				{
+					cerr << "Size of object list (" << mtest.getObjListSize() << ") is <= " << index << "!!!" << endl;
+					return errorOption(CMD_OPT_ILLEGAL, tokens[1]);
+				}
+				else
+				{
+					mtest.deleteObj(index);
+				}
+			}
+			else
+			{
+				return errorOption(CMD_OPT_ILLEGAL, tokens[0]);
+			}
+		}
+	}
+	else
+	{
+		if (AIndex > 1)
+		{
+			errorOption(CMD_OPT_EXTRA, tokens[1]);
+			return CMD_EXEC_ERROR;
+		}
+		else
+		{
+			if (AIndex == 0)
+			{
+				if (n < 3)
+				{
+					errorOption(CMD_OPT_MISSING, "");
+					return CMD_EXEC_ERROR;
+				}
+				else if (n > 3)
+				{
+					errorOption(CMD_OPT_EXTRA, tokens[3]);
+					return CMD_EXEC_ERROR;
+				}
+				else
+				{
+					int newarrs = 0;
+					if (!myStr2Int(tokens[AIndex + 1], newarrs) || newarrs < 1)
+					{
+						errorOption(CMD_OPT_ILLEGAL, tokens[AIndex + 1]);
+						return CMD_EXEC_ERROR;
+					}
+					int newobjs = 0;
+					if (!myStr2Int(tokens[2], newobjs) || newobjs < 1)
+					{
+						errorOption(CMD_OPT_ILLEGAL, tokens[2]);
+						return CMD_EXEC_ERROR;
+					}
+					mtest.newArrs(newobjs, newarrs);
+				}
+			}
+			else
+			{
+				if (n < 3)
+				{
+					errorOption(CMD_OPT_MISSING, "");
+					return CMD_EXEC_ERROR;
+				}
+				else if (n > 3)
+				{
+					errorOption(CMD_OPT_EXTRA, tokens[3]);
+					return CMD_EXEC_ERROR;
+				}
+				else
+				{
+					int newarrs = 0;
+					if (!myStr2Int(tokens[AIndex + 1], newarrs) || newarrs < 1)
+					{
+						errorOption(CMD_OPT_ILLEGAL, tokens[AIndex + 1]);
+						return CMD_EXEC_ERROR;
+					}
+					int newobjs = 0;
+					if (!myStr2Int(tokens[0], newobjs) || newobjs < 1)
+					{
+						errorOption(CMD_OPT_ILLEGAL, tokens[0]);
+						return CMD_EXEC_ERROR;
+					}
+					mtest.newArrs(newobjs, newarrs);
+				}
+			}
+			//mtest.newObjs(newobjs);
+		}
+	}
+	//mtest.deleteObj(0);
+	//mtest.deleteArr(0);
 	return CMD_EXEC_DONE;
 }
 
